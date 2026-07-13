@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import '../services/auth_service.dart';
 import '../services/token_storage.dart';
 import 'register_screen.dart';
+import 'admin_room_list_screen.dart';
+import 'customer_room_list_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -35,13 +37,19 @@ class _LoginScreenState extends State<LoginScreen> {
     if (result['success'] == true) {
       await TokenStorage.saveSession(result['token'], result['role']);
 
-      final savedToken = await TokenStorage.getToken();
-      print('Saved token: $savedToken');
-
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login successful! Role: ${result['role']}')),
-      );
+
+      if (result['role'] == 'admin') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const AdminRoomListScreen()),
+        );
+      } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const CustomerRoomListScreen()),
+        );
+      }
     } else {
       setState(() {
         _errorMessage = result['message'];
